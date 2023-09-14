@@ -1,0 +1,349 @@
+/*
+--------------------------
+*** Variables
+--------------------------
+*/
+
+/* Security Code - 
+Change this and positioning of elements will be recalculated. */
+
+:root {
+    --container-width: 900px;
+    --container-height: 400px;
+    
+    --content-bgcolor: darkgreen;
+    --content-text-color: white;
+    
+    --lockscreen-bgcolor: #222;
+    --lockscreen-text: #ddd;
+    --lockscreen-padding: 40px;
+    
+    /* Control knob settings */
+    --dial-diameter:240px;
+    --control-knob-diameter: 392px;
+    --control-font-size: 1.3em;
+    --control-knob-color: #222;
+    
+    --outer-ring-diameter: 394px;
+    --control-knob-recess-diameter: 184px;
+    
+    /* Security Code Number Positions */
+    --first-number-position: -1600px;
+    --second-number-position: 0px;
+    --third-number-position: -800px;
+    
+    /* Security Animation Length */
+    --animation-length: 5s;
+  }
+  
+  /*
+  --------------------------
+  *** Main Layout
+  --------------------------
+  */
+  
+  .wrapper {
+    width: 980px;
+    margin: 20px auto;
+    position: relative;
+  }
+  
+  .container {
+    font-family: Helvetica, Arial, sans-serif;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--container-width);
+    height: var(--container-height);
+    padding: var(--lockscreen-padding);
+    border-radius: 20px;
+  }
+  
+  /* Content Section */
+  #content {
+    background-color: var(--content-bgcolor);
+    color: var(--content-text-color);
+  }
+  
+  #content h1 {
+    font-size: 4em;
+    text-align: center;
+  }
+  
+  #content h2 {
+    font-size: 2.5em;
+    text-align: center;
+  }
+  
+  #content p {
+    font-size: 1.6em;
+    text-align: center;
+  }
+  
+  /* Lockscreen Section */
+  #access {
+    background-color: var(--lockscreen-bgcolor);
+  }
+  
+  #codes {
+    display: block;
+    position: absolute;
+    width: 360px;
+    height: 80px;
+    top: 190px;
+    left: 500px;
+    overflow: hidden;
+    color: var(--lockscreen-text);
+    border: 20px solid #aaa;
+    border-radius: 8px;
+    background: linear-gradient(0deg, #111 10%, #666 50%, #222 100%);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  #codes ul {
+    position: absolute;
+    width: 104px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    font-size: 4em;
+    border-left: 8px dotted black;
+    border-right: 8px dotted black;
+  }
+  
+  #codes li {
+    line-height: 80px;
+  }
+  
+  #codes .digit-one {
+    top: 0;
+    left: 0;
+  }
+  
+  #codes .digit-two {
+    top: 0;
+    left: 120px;
+  }
+  
+  #codes .digit-three {
+    top: 0;
+    left: 240px;
+  }
+  
+  /* Code Dial */
+  #dial {
+    width: var(--dial-diameter);
+    height: var(--dial-diameter);
+    background: linear-gradient(135deg, #fff 20%, #888 50%, #222 100%);
+  }
+  
+  #dial .outer-ring {
+    width: var(--outer-ring-diameter);
+    height: var(--outer-ring-diameter);
+    background: radial-gradient(circle at 70% 70%, #666 40%, #fff 80%, #cccccc);
+    border: 1px solid #888;
+  }
+  
+  #dial .control-knob {
+    width: var(--control-knob-diameter);
+    height: var(--control-knob-diameter);
+    background-color: var(--control-knob-color);
+  }
+  
+  #dial .control-knob-recess {
+    width: var(--control-knob-recess-diameter);
+    height: var(--control-knob-recess-diameter);
+    /* background: radial-gradient(circle at 60% 60%, rgba(34, 34, 34, 0.8) 50%, rgba(34, 34, 34, 1) 90%, #cccccc); */
+  }
+  
+  /* Code Dial Animation */
+  .dial-animation {
+    width: var(--dial-diameter);
+    height: var(--dial-diameter);
+    position: absolute;
+  top: 50%; /* 수직 방향 가운데로 조정 */
+  left: 50%; /* 수평 방향 가운데로 조정 */
+  transform: translate(-50%, -50%); /* 요소의 중심을 가운데로 조정 */
+  z-index: 1; /* 다른 요소 위에 나타나도록 조정 */
+
+  }
+  
+  .dial-animation .marker {
+    width: 6px;
+    height: 40px;
+    background: linear-gradient(0deg, var(--control-knob-color) 92%, rgba(34, 34, 34, 0.8) 92%, rgba(34, 34, 34, 0.8) 100%);
+    position: absolute;
+    top: 0;
+    left: calc(var(--dial-diameter) / 2 - 3px);
+  }
+  
+  .dial-animation .control-knob {
+    width: calc(var(--control-knob-diameter) - 2px);
+    height: calc(var(--control-knob-diameter) - 2px);
+    border: 6px dotted var(--control-knob-color);
+    border-radius: 50%;
+
+  }
+  
+  .dial-animation .control-knob a {
+    display: block;
+    line-height: calc(var(--control-knob-diameter) - 2px);
+    width: 100%;
+    text-align: center;
+    font-size: var(--control-font-size);
+    color: var(--lockscreen-text);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  
+  /*
+  -----------------------------------------------------
+  *** Animation Trigger Code
+  -----------------------------------------------------
+  
+  Rotate dial and code numbers to reveal the numbers 247.
+  At the end of the rotation sequence, slide the lock panel
+  away to reveal the content behind.
+  
+  */
+  
+  #access:target {
+    animation: unlock 3.0s ease-in var(--animation-length) forwards;
+  }
+  
+  #access:target .dial-animation {
+    animation: rotate var(--animation-length) ease forwards;
+  }
+  
+  #access:target .digit-one {
+    animation: first var(--animation-length) ease forwards;
+  }
+  
+  #access:target .digit-two {
+    animation: second var(--animation-length) ease forwards;
+  }
+  
+  #access:target .digit-three {
+    animation: third var(--animation-length) ease forwards;
+  }
+  
+  /* Animation Keyframes */
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(792deg);
+    }
+    85% {
+      transform: rotate(144deg);
+    }
+    100% {
+      transform: rotate(612deg);
+    }
+  }
+  
+  @keyframes first {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(var(--first-number-position));
+    }
+    100% {
+      transform: translateY(var(--first-number-position));
+    }
+  }
+  
+  @keyframes second {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(var(--first-number-position));
+    }
+    85% {
+      transform: translateY(var(--second-number-position));
+    }
+    100% {
+      transform: translateY(var(--second-number-position));
+    }
+  }
+  
+  @keyframes third {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(var(--first-number-position));
+    }
+    85% {
+      transform: translateY(var(--second-number-position));
+    }
+    100% {
+      transform: translateY(var(--third-number-position));
+    }
+  }
+  
+  @keyframes unlock {
+    0% {
+      transform: translateY(0);
+    }
+    2% {
+      transform: translateY(20px);
+    }
+    15% {
+      transform: translateY(20px);
+    }
+    100% {
+      transform: translateY(480px);
+    }
+  }
+  .control-knob {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--control-knob-diameter);
+    height: var(--control-knob-diameter);
+    background-color: var(--control-knob-color);
+    border-radius: 50%;
+    position: relative; /* 부모 요소로부터 상대 위치 설정 */
+  }
+  
+  .click-here {
+    text-decoration: none;
+    color: var(--lockscreen-text);
+    font-size: var(--control-font-size);
+    white-space: nowrap;
+    background-color: rgb(17, 17, 17);
+    padding: 10px 10px;
+    border-radius: 50%;
+    position: absolute; /* 부모 요소에 대한 절대 위치 설정 */
+    top: 50%; /* 상단 가운데 위치 */
+    left: 50%; /* 좌측 가운데 위치 */
+    transform: translate(-50%, -50%); /* 수평 및 수직으로 가운데 정렬 */
+  }
+  
+  /* clawmachine.css */
+
+.claw-machine-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px; /* 화면 높이에 따라 가운데 정렬합니다. */
+  }
+  .image-container {
+    text-align: center; /* 이미지 및 텍스트를 중앙 정렬합니다. */
+  }
+  .centered-image {
+    /* 이미지를 가운데로 정렬합니다. */
+    display: block;
+    margin: 0 auto;
+  }
+  .centered-text {
+    /* 텍스트 스타일링을 적용합니다. */
+    font-size: 24px; /* 원하는 크기로 조정하세요. */
+    margin-top: 20px; /* 이미지와 텍스트 사이의 간격 조정 */
+    font-weight: 500;
+  }
